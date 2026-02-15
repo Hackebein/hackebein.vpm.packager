@@ -1,0 +1,87 @@
+name: Build Release (tag)
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      LISTING_OWNER: hackebein
+      LISTING_REPO: VPM-Listing
+      LISTING_WORKFLOW_ID: build-listing.yml
+      LISTING_REF: main
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Derive version from tag
+        id: tag
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Update package.json version
+        uses: jossef/action-set-json-field@890d7642122dbb2833dddd2003659bb71a2b21fe
+        with:
+          file: ./package.json
+          field: version
+          value: ${{ steps.tag.outputs.version }}
+
+      - name: Get package name
+        id: name
+        uses: zoexx/github-action-json-file-properties@d02f28167f05bf70cd75352b11c25a4e8c39bf38
+        with:
+          file_path: ./package.json
+          prop_path: name
+
+      - name: Track package meta files
+        shell: bash
+        run: find . -name \*.meta > metaList
+
+      - name: Create UnityPackage
+        uses: pCYSl5EDgo/create-unitypackage@b5c57408698b1fab8b3a84d4b67f767b8b7c0be9
+        with:
+          package-path: ./${{ steps.name.outputs.value }}-${{ steps.tag.outputs.version }}.unitypackage
+          include-files: metaList
+
+      - name: Create package zip
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          find . -name \*.meta | sed 'p;s/\.meta$//' > fileList
+          zip -r "./${{ steps.name.outputs.value }}-${{ steps.tag.outputs.version }}.zip" . -i @fileList
+
+      - name: Make Release
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8
+        with:
+          files: |
+            ./${{ steps.name.outputs.value }}-${{ steps.tag.outputs.version }}.zip
+            ./${{ steps.name.outputs.value }}-${{ steps.tag.outputs.version }}.unitypackage
+            ./package.json
+          tag_name: ${{ github.ref_name }}
+          token: ${{ secrets.TOKEN }}
+          generate_release_notes: true
+
+      - name: Trigger VPM listing rebuild
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: process.env.LISTING_OWNER,
+              repo: process.env.LISTING_REPO,
+              workflow_id: process.env.LISTING_WORKFLOW_ID,
+              ref: process.env.LISTING_REF,
+            })
+
