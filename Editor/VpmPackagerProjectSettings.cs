@@ -9,6 +9,10 @@ namespace hackebein.vpm.packager.editor
 {
     internal static class VpmPackagerProjectSettings
     {
+        internal const int DefaultVpmmUploadChunkSizeMb = 16;
+        internal const int MinVpmmUploadChunkSizeMb = 1;
+        internal const int MaxVpmmUploadChunkSizeMb = 1024;
+
         [Serializable]
         internal sealed class Data
         {
@@ -20,6 +24,9 @@ namespace hackebein.vpm.packager.editor
 
             // Previous keys (stored in project, so be mindful of source control!).
             public List<string> vpmmKeyHistory = new List<string>();
+
+            // Chunk payload size in MB for upload requests.
+            public int vpmmUploadChunkSizeMb = DefaultVpmmUploadChunkSizeMb;
         }
 
         private const string SettingsRelativePath = "ProjectSettings/VpmPackagerSettings.json";
@@ -116,6 +123,10 @@ namespace hackebein.vpm.packager.editor
                 data.vpmmBaseUrl = "https://vpmm.dev";
 
             data.vpmmApiKey = (data.vpmmApiKey ?? "").Trim();
+
+            if (data.vpmmUploadChunkSizeMb <= 0)
+                data.vpmmUploadChunkSizeMb = DefaultVpmmUploadChunkSizeMb;
+            data.vpmmUploadChunkSizeMb = Math.Max(MinVpmmUploadChunkSizeMb, Math.Min(MaxVpmmUploadChunkSizeMb, data.vpmmUploadChunkSizeMb));
 
             if (data.vpmmKeyHistory == null)
                 data.vpmmKeyHistory = new List<string>();

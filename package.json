@@ -1,18 +1,13 @@
 {
   "name": "hackebein.vpm.packager",
-  "displayName": "Hackebein VPM Packager",
+  "displayName": "Hackebein's VPM Packager",
   "version": "0.1.0",
   "unity": "2022.3",
   "description": "Editor tools to edit VRChat VPM package.json files and export VPM zips.",
-  "keywords": [
-    "VRChat",
-    "VPM",
-    "UPM",
-    "Package",
-    "Exporter"
-  ],
   "author": {
-    "name": "Hackebein"
+    "name": "Hackebein",
+    "email": "hackebein@gmail.com",
+    "url": "https://hackebein.dev"
   }
 }
 

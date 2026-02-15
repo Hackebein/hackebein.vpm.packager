@@ -279,6 +279,7 @@ namespace hackebein.vpm.packager.editor
                         baseUrl: settings.vpmmBaseUrl,
                         apiKey: settings.vpmmApiKey,
                         zipPath: result.zipPath,
+                        uploadChunkSizeMb: settings.vpmmUploadChunkSizeMb,
                         onSuccess: jobId =>
                         {
                             EditorUtility.DisplayDialog(
