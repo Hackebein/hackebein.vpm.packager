@@ -4,6 +4,8 @@ Unity Editor tooling to **edit VRChat VPM `package.json` files**, **build/export
 
 Package ID: `hackebein.vpm.packager` · Unity: `2022.3+`
 
+Add `https://vpm.hackebein.dev/index.json` or `https://vpmm.dev/hackebein.vpm.packager.json` to VCC/ALCOM.
+
 ## What it does
 
 - **`package.json` editor** inside Unity (no more hand-editing JSON in an external editor)
@@ -20,4 +22,3 @@ This tool aims to make it a **single, repeatable Unity-native flow**: *edit → 
 
 - Unity 2022.3
 - [VPMM.dev API Key](https://vpmm.dev/) (top right)
-
